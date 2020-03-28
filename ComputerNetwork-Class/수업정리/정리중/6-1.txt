@@ -1,0 +1,51 @@
+Link Layer
+
+introduction.... 
+링크 레이어에서는 host나 router를 node로 부름...
+link layer는 physically adjacent... 물리적으로 node사이에 인접하고 있다.
+
+
+//transport layer는 도착했는지만 신경쓰지만
+link layer는 어떻게 어디를 통해서 갔는지....
+
+datagram (IP datagram)routing algorithm..., communication link, link layer protocol
+
+datagram은 routing algorithm으로 어느어느 링크를 통해서 이동한다.
+
+application - message, transport - segment, network - datagram, @link - frame@
+
+
+
+Ethernet....
+유선 lan 케이블...//
+이더넷 안에는 다양한 link layer기술이 있다.
+
+ethernet: physical topology....
+bus: 90년대 중반에 많이 썻고... 모든 노드가  하나의 케이블에 연결되어있다.
+star: switch를 통해...연결되어있다.
+
+ethernet fram structure
+frame에는... preamble.. dest address source address,type,+ data(IP datagram), CRC
+--> 
+preamble.. 64비트로 구성.. <10101010>7bytes이고, <10101011>1bytes ==> 8bytes..이 preamble은 frame맨앞에 있어서...
+패킷이 이제 시작이라는 것을 의미.. 예로 1001010101011010101 막 이런식으로 data가 들어오는데... 10101010 이 부분부터 frame이라는 것을
+보여주기 때문에.. 64비트로 구성한 이유가...랜덤한 다른 데이터와 오인될 수 있기 떄문에 1/2^64 확률..구분..
+
+
+address: MAC address...
+type:... 상위레이어가 뭔지... 대부분 ip..
+CRC: 용도는 checksum과 비슷...받은 패킷...frame에 에러가 있는지 확인.--checksum보다 에러를 잘 찾는 수학적임..
+
+
+Ethernet: unreliable, conectionless..
+connectionless...데이터를 보낼때 미리 connection필요없이 그냥 바로 보내도 된다.
+unreliable:CRC check를 해서 frame의 datagram에 에러가잇으면 그냥 버림... 재전송하지는 않는다.
+--상위레이어 (transport layer)에서 해준다..
+
+
+근데 와이파이에서는 재전송해준다.WIFI-reliable.
+기본적으로 wifi가 ethernet보다 에러가 발생할 확률이 높기 때문에 에러가 나면 재전송해준다.
+
+그래서 각 link layer마다 특징이 달라 protocol이 달라진다.
+
+

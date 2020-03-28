@@ -1,0 +1,183 @@
+Autonomous System(AS)
+
+
+
+같은 AS내에서는 같은 routing protocol 을 놀린다. -==> 같은 AS내에서는 동일한 intra-AS routing protocol을 돌린다...
+
+gateway router -- 다른 AS를 연결시켜준다....AS사이에서는 gateway routers로 연결되어있다. 그래서 gateway router 내에서는 inter AS routing이 돌아가고
+같은 AS내에서는 intra as routing protocol로 돌아간다.
+
+
+Intra-AS Routing...하나의 AS내에서 돌아가는것...
+== interior gateway protocols (IGP)
+RIP, "OSPF - diykstra algoritm", IGRP
+
+
+*OSPF
+- link state route를 이용..... >> dijkstra algoritm...전체 flooding (같은 as 내의 전체 맵을 그림..그 후 dijkstra algorithm수행)
+---- protocol (약속) - 링크스테이트의 변화가 있을 때 flooding.. -- link의 정보의 변화가 없어도 30분의 한번씩 주기적으로 linkstate를 
+수행 (그 라우터가 살았는지 죽었는지 모르기 때문에 보내줘야한다.)
+- security --- OSPF를 사용하는 라우터에 잘못된 link state정보를 보낼 수 있다. --> 잘못된 그림 --> 잘못된 라우팅....
+그래서 라우터 끼리 주고받는 링크스테이트 메시지는 보안.....>> password를 입력, shared secret keys.
+- dijkstra는 다른 shortest path가 있으면 또 찾을 수 있다... 결국 여러개의 same-cost path를 찾을 수 있다., 
+dv는 shortest path는 하나만 찾을 수 잇다--->link state...dv의 차이
+
+----------------------------
+Inter AS Routing
+
+Intra AS routing으로 한 as내의 라우터는 다른 as내의 라우터로 가는 길을 모르기 때문에...
+
+forwading table에는 intra as routing 정보와 inter as routing 정보가 같이 있다.
+
+*BGP (Border Gateway Protocol)
+- eBGP (external BGP)-- 외부로부터의(이웃한 AS들) reachability information를 알게 됨.
+- iBGP (internal BGP) -- 그 reachability information을 내부의 라우터들에게 알려줌
+
+BGP는 policy에 따라 routing이 결정됨 (//원래는 최적의 cost를 가진 것들을 찾아갔는데.......)
+
+p.13 - 같은 as내에서는 iBGP를 수행, 다른 as와 연결된 부분은 eBGP... 그래서 as 내부의 라우터끼리는 iBGP connection만 필요하지만
+외부 AS와 연결하는 라우터는 eBGP도 필요
+
+p.14
+한 AS(AS3)의 라우터(3a)는 연결된 외부의 다른 AS(AS@)의 라우터(2c)에게 BGP advertisment를 보냄...
+3a쪽으로 오면 AS3의 정보를 알 수 있어라고...그리고 x에게 보낼려면 나(3a)한테 보내면 돼!
+---> 이는 policy-based routing: policy에 따름
+
+p.16 2c는 iBGP로 같은 AS내의 router들에게 정보를 보냄...
+이 때 2a는 AS1의 1c에게 BGP advertisment를 보냄(나(2a)로 오면 AS2, AS3의 정보를 알수 있어)
+
+p.17
+만약 AS1의 1c와 AS3의 3a가 연결 되면 3a는 1c에게 BGP advertisement를 보냄...
+1c는 subnet x로 가기위한 정보를 같은 AS내의 라우터들에게 iBGP로 보냄.... 그러면 각 라우터는 forwarding table에 업데이트..
+
+p/18
+1d가 x로 갈려면 1c로 보내면 됨../p.19 1a가 x로 갈려면 1d로 가면 됨(intra as routing으로 알고 있음)
+각 라우터들이 외부정보를 갖는것은 iBGP를 통해서 알고... 각 라우터로 가는 길은 intra AS routing으로 알고 있음
+
+p.20..
+Hot Potato Routing : 2d 입장에서 x로 갈 때.. 2a를 통해 가거나 2c로 까지 (gateway route)까지 밖에 정보를 모름... 그래서 intra as routing으로
+작은 값쪽으로 감..
+
+
+p.21: BGP: achieving policy via advertisements
+길이 있어도... 길을 가는게 아님..
+길이 있고, customer와 provider의 관계가 맞을 때 그때 주고받음..
+ex) customer network과 provider network에게 돈을 주고 provider가 customer에게 서비스를 제공..
+customer network관점에서는 ...customer network로 들어오는 트래픽은 목적지가 customer이여야함.. 나가는 트래픽은 출발지가 자신이여야함..
+이런 규칙을 갖춰야함.
+예로 x customer가 B한테만 돈을 줬을 때... C로부터 들어오는 트래픽은 받지 않는다!!
+
+p.22 x가 c로 데이터를 보내기 싫으면.. B한테 X->C라는 길을 advertisement를 안해주면 됨... 그러면 B는 x-c라는 길을 모르기 때문에
+C로가는 데이터를 x로 안보냄..
+===> 결국 돈도 안받는데 남 좋은 일을 안함
+
+
+p.23...provider...관점.. customer로부터 나오는 데이터를 전달....customer가 목적지인 데이터를 전달...
+자신의 customer의 목적지거나 출발지인 데이터만 받음.. 나머지는 돈도 안되니깐 안받음..
+
+A라는 provider는 B랑 C에게 A-w 를 advertisement를 할까말까.....--> 해도 됨.. 상관없음..
+B provider는 B->A->w라는 길은 x에게 알려줘도됨.. B와 x, A-w는 customer와 provider관꼐
+하지만 그 정보를 C에게는 안알려줌... 
+
+결국 모든 길은 policy에 따라 길이 결정됨..
+
+
+
+
+
+
+
+-----------------
+
+SDN
+
+라우터 업체들은 proprietary(사유..오픈소스의 반대..)로 구성된 기술을 통해 Internet standard protocols...를 구현
+라우터업체에서 제공하는 기능만 사용가능... ///// middlebox...(firewall NAT등등)은 추가적인 장비가 필요
+
+그래서 추가적인 기능을 같이 사용하기 위해 SDN탄생
+ per router control plane - 각 라우터에서 control plane과 data plane이 수행
+
+logically centralized control plane... - 각 라우터들이 정보를 외부의 하나의 control plane으로 보낸다. 그곳에서 algorithm 수행..
+그 정보를 각 라우터에 전달=== 라우터안의 CA (control agents)를 통해 정보를 주고받는다.
+왜 logically centralized control plane을 사용할까..
+- 네트워크 관리가 쉬워진다.control plane에 모여진 정보를 통해 문제가 있는 라우터는 바로 찾을 수 있다.
+open(non-proprietary)... 오픈되어있어서 구현하기 쉽다
+
+
+
+p.36... programmable control applications..
+
+Data plane switch는... 과거의 라우터처럼 복잡한 작업을 하는 것이 아니라 conrol plane으로부터 받은 정보 기능을 수행만 함.
+
+SDN controller... control plane에서 일을 수행하기 위해서는 각 라우터들의 정보를 가지고 있어야한다. 분산적으로 여러대의 서버가 같이 ㅜ행된다.
+
+...
+
+SDN: control applications
+밑의 라우터 정보를 수집하여 각각의 스위치가 필요한 table을 만든다.. 이런것들은 control plane안에 application 형태로 있다.
+
+
+--> OpenFlow protocol...
+switch가 controller에게 port-status(linkstate)정보를 준다. 그래서 cotroller가 linkstate정보를 알 수있어서 map을 그린다.
+그후 controller가 switch에게 modify state를 보낸다..(예...알고리즘으로 수행해보니깐 이쪽 길로 가는게 더 좋을 것 같아)
+그리고 read state를 보낸다. count(통계자료/..match+action을 몇번했는지 등등)를 controller로 가져온다.
+
+##per router vs SDN ...
+suppose to running dijkstra's algorithm
+per-router control: linkstate routing.... 주기적읜 linkstate flooding을 하고, 모든 라우터에서 dijkstra algorithm을 수행...
+
+SDN
+control plane에서 각 라우터들의 정보를 받고 applicaion에서 dijstra algorithm수행
+
+스위치들이 controller에게 정보를 준다. 그 정보를 application에서 dijkstra algorithm수행...
+message complexity...o(n)
+
+
+p.42
+만약 per-router에서 s1-s2연결이 끊어지면 s1이 모든 라우터한테 flooding한다. 하지만 centralized 에서는 s1이 controller한테 알려준다.
+OpenFlow- port status 메시지를 통해서..알려준다. (몇번 포트에 문제가 생겼어) 그러면 controller가 link state 정보를 업데이트한다. 
+그 후 controller가 그 정보를 application으로 주고 application이 dijkstra algorithm을 수행한다. --> 바뀐 결과값을 flow table에 업데이트된다.
+controller는 modify state 메시지로 업데이트 된 테이블 정보를 스위치들한테 전달한다.
+
+그래서 SDN에서 새로운 algorithm을 쓰고 싶으면 application만 바꾸면 된다.
+
+q3. linkstate info가 바뀐다.
+
+SDN usages... google data centers , 5G ..미래인터넷에서는 SDN을 사용할것으로 예측
+
+
+
+
+
+
+
+
+
+-------------------
+
+ICMP
+
+
+IP datagram format에 upper layer에는 TCP, UDP, ICMP중 사용하는 프로토콜을 적어준다.
+TTL...time to live - ex) ttl에 10을 적어서 보내면 라우터를 지날 때마다 1씩 빼준다. 만약 10번째 라우터를 가서 0이되면 드랍된다.
+
+보통 host나 router에서 control information을 사용하기 위해 사용한다.
+에러메시지나 ping을 주고받는데 사용..
+핑.. ICMP message: type, code + other information
+
+만약 ttl이 0이 되서 드랍되면 드랍될 때 라우터에서 보낸 쪽으로 TTL expired를 보냄으로써 ttl이 0이 되서 드랍됨을 알 수 있다. 11, 0
+
+
+Traceroute and ICMP
+window dos에서 tracert를 하면 목적지까지 거쳐간 라우터들을 알 수 있다. 만약 ttl=1을 보내면 첫번째 라우터를 가서 ttl이 0이 되서 드랍되고
+ttl expired 메시지를 다시 보냄으로 써 어떤 라우터를 거쳤는지 알 수 있다.
+
+
+udp는 거의 사용하지 않는 포트번호를 사용... receiver쪽에서 아마 그 포트번호를 열지않음으로써.. dest port unreachable 3, 3을 다시
+보내서 어떤 라우터에서 걸쳤는지 알 수 있다. 
+
+security issues... 
+ping attck...특정 서버에 ICMP packet을 계속 보내면 그 메시지에 응답하느라 다른 일을 못하게 됨..
+ping sweep: 여러개의 포트번호를 사용해가며 보내면 그 라우터의 취약한 포트번호를 알 수 잇다.
+
+--- 대부분 firewall에서 걸림..

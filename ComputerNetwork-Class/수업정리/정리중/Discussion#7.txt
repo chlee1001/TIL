@@ -1,0 +1,8 @@
+ls = synchronous
+dv = asynchronous
+
+ls vs dv
+linkstate는 내 이웃의 정보를 모두에게..==> 전체 그림을 알고 있다. ==> 전체 그림을 보고 diykstra를 이용해서 계산
+distance vector는 모두까지의 정보를 이웃한테만..==> 내 이웃의 정보만 받기 때문에 전체 그림을 모른다. ==> bellman-ford로 계산
+
+

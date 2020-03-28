@@ -1,0 +1,133 @@
+Network layer
+control plane..
+
+per router 기준으로.-----------
+
+forwarding table을 기준으로 match + action...control plane의 결정을 보고 하는데 control plane을 라우팅 알고리즘으로...
+포워딩 테이블이랑 라우팅 알고리즘을 각자 구현..
+
+라우팅 알고리즘의 목적....
+soure router에서 destination router까지 좋은 경로를 찾는 것...원래 호스트에서 목적지 호스트까지 최적의 경로..
+기본 router는 first-hop router 소스라우터는 기본 라우터의 소스호스트....목적지 라우터는 기본 라우터의 목적지 라우터..
+goog path: the least cost
+min hop path...라우터를 최소로 거쳐서 가는 길..
+
+
+Graph abstraction..
+소스에서 목적지까지 cost가 가장 적게 걸리는 path....  (각 link들마다 cost가 있다.)
+c(x,x') = 링크(x,x')의 코스트
+cost of path = 출발지와 목적지를 연결하는 path들의 cost 합... 경로는 여러개 나올 수 있어서 cost가 가장 낮은것을 찾아야한다.
+--> 하나하나 cost를 따지면 좋지않음... complexity..복잡성이 높음..
+==> 그래서 간단하게 가장 낮은 cost를 가지는 path를 찾아야함..
+
+routing algorith classification
+global: 모든 router전체를 알고... 전체 네트워크 정보를 알고있을 때..
+decentralized. 이웃만 알 고 있을 떄..
+
+global...전체 네트워크 지도를 알고 있어야한다. 하지만 혼자 갑자기 전체 지도를 알 수없다..
+--> 각 라우터들은 이웃 정보를 알고있다.라는 가 정 (가능한 이유가 같은 subnet안에 있기 때문에 쉽게 이웃 라우터 정보를 알 수 있다.하지만 전체 그림은 모름)
+-->그렇기 때문에.. 모든 라우터들의 이웃 정보를 모으면 전체 그림을 그릴 수 있다. == 모든 라우터는 자신의 이웃 정보를 모두에게 보낸다.
+== flooding하면 모든 라우터는 전체 그림을 가지고 있게 된다.
+이 전체 그림으로 라우팅 알고리즘을 돌림.. 각 노드에 대한 least path를 구하고 forwading table에 저장..
+
+
+Dijskstra' algorithm
+input...graph with link costs
+
+source U
+c(i,) 각 link cost
+D(v) path의 cost... 현재 알고 있는 목적지 v까지의 코스트
+Pv) forwarding table의 path의 cost
+N' 
+
+ 
+
+
+
+
+---------
+dijkstra's algorithm.....각 반복에서 n번의 비교를 해야함.. o(n^2)
+하지만 head 구조로 data가 있으면 o(nlogn)
+
+ascillations possible
+link cost에 따라 traffic이 발생...
+dijkstra algorithm의 묹는.... ascillations발생...
+
+
+
+
+
+
+!!!!!!!!distance vector
+Distance Vector
+--가정: 모든 노드는 각각 이웃된 노드의 정보를 가지고 있다.(LS와 같이)
+각 노드들은 Distance Vector(DV)를 가지고 있다.
+나로부터의 모든 다른 노드의 잠정적인 shortest path를 알 고있다. ==> distance vector
+각자 가지고 있는 distance vector를 이웃에게 보낸다. ==> 이웃은 그 받은 distance vector를 보고 자신의 DV를 업데이트 한다.
+점점 이웃으로부터의 정보를 가지고 자신의 Distance Vector를 업데이트 해 가는 과정을 Distance vector algorithm이라고 한다.
+
+ls vs dv
+linkstate는 내 이웃의 정보를 모두에게..==> 전체 그림을 알고 있다. ==> 전체 그림을 보고 diykstra를 이용해서 계산
+distance vector는 모두까지의 정보를 이웃한테만..==> 내 이웃의 정보만 받기 때문에 전체 그림을 모른다. ==> bellman-ford로 계산
+
+이웃으로부터 정보를 받으면 bellman-ford 실행
+
+
+bellman-ford queation
+x에서 v 까지의 코스트(이웃한 노드의 코스트)와  이웃한 노드에서 목적지의 코스트 중에 최소를 찾는 것..
+
+bellman-ford를 했음에도 값의 업데이트가 없으면 최적의 경로를 찾았음을 의미함.
+
+p.44 -- v에서 Z까지의 cost, x에서 Z까지의 cost, W에서 Z까지의 cost DV를 U가받고 이것들을 bellman ford를 이용해서 min{c(u,v)+dv(z)
+////이렇게 u에서 이웃한 v까지 가서 v에서 z까지의 cost를 합한 것과...u에서 이웃한 x까지의 코스트와 x에서 z까지의 cost를 더한것들의 최소를 구한다.
+
+이런식으로 업데이트를 반복적으로 한다.. <<업데이트가 안될 때 까지..
+
+asynchronous함.. 각 노드들이 가지고 있는 그림은 모두 달라서 결과가 다 다르게 나옴
+
+linkstate는 synchronous함... 각 노드들은 모두 똑같은 그림을 가지고 dijkstra를 돌리기 떄문에 모두 결과가 똑같음
+
+
+각 노드가 이웃으로부터 받은 정보로 계산 -->나의 DV값이 변경되면 ... 이 정보를 다시 이웃한테 준다
+그 이웃은 받은 정보로 계산 자신의 DV값이 변경되면..다시 이웃한테 준다.. 이 과정은 이웃이 받은 정보로 DV가 업데이트가 되지 않을 때까지 한다.
+
+
+각 노드의 DV와 이웃노드의 DV를 다 가지고 (Distance Vector table)로 bellman-ford 계산
+
+
+
+
+message complexity
+LS : 각 노드가 모든노드에게 정보를 보내기 때문에 n*e    nodes* links
+DV는 n* k   nodes * number of neighbors
+
+speed of convergence
+ls: o(n2)
+dv.... 정보를 주면 업데이트...다시 정보가 오면 또 업데이트... 이런ㄴ식으로 반복되서 convergence는 느리다.
+
+
+
+
+
+
+
+
+
+
+
+Distance vector : link cost changes
+
+--결국 좋은 소식을 빠르게, 안좋은 소식은 느리게 전달됨.
+--> link cost가 안좋게 변하면.... loop이 발생할 수 있음...
+posioned reverse.
+>>>>만약 z가 y를 걸쳐 x로 갔을 때...값이 변해서... y에게 z자신의 dv를 가르쳐줄 때..자신을 무한대로 가르쳐준다. (z가 y를 걸쳐서 갔는데.. y가 다시 z를 걸쳐서 못가게 하려고)
+-----> 한 노드가 다른 노드를 걸쳐서 갔고 값이 변경되어 이웃노드에게 dv를 가르쳐줄 때 그 걸쳐갔던 애한테는 무한대로 가르쳐줌
+
+
+
+
+
+
+
+
+

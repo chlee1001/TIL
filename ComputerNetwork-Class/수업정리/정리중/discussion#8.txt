@@ -1,0 +1,28 @@
+1. OpenFlow controller
+
+OpenFlow protocol...
+switch가 controller에게 port-status(linkstate)정보를 준다. 그래서 cotroller가 linkstate정보를 알 수있어서 map을 그린다.
+그후 controller가 modify state를한다...(forwarding table에값을 add/delete....)....(예...알고리즘으로 수행해보니깐 이쪽 길로 가는게 더 좋을 것 같아)
+그리고 read state를 보낸다. count(통계자료/..match+action을 몇번했는지 등등)를 controller로 가져온다.
+
+2. per router --- 각 라우터들을 바꿔야함.
+sdn -- application을 바꿈..
+
+3.
+	3. 3 -- destination unreachable port number
+	11.0 --TTL expired
+
+4.
+HTTP에 request와 response할 때 packet size가 크기 때문에 쪼개져서 전달되는데.. ㄷ이 때 패킷의 순서(order)와 reliable 위해 TCP를 사용한다.
+------>>>> HTTP는 메시지 크기가 크다... --> 패킷을 쪼개서 보냄.. --> 순서가 중요함! 
+만약 여러 패킷중 하나가 안오면 그 하나만 다시 보내면 된다 ///UDP사용하면 전체가 다시 보내야함.....
+
+
+DNS에 UDP를 사용하는 이유가 packet size가 작기때문에... ////
+unreliable-->query를 보내주면... reply가 오는데.. reply가 오지않으면 query를 다시 보내면 된다..
+
+
+5.
+data stream을 port number로 구분지어 보내는 것이 demultiplexing
+---ipaddress로 묶어서 보내는 것이 multiplexing
+

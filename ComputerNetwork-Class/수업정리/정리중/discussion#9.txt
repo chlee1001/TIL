@@ -1,0 +1,13 @@
+dis
+
+3.
+receiver가 packet을 받지만 ack이 loss되면, sender는 재전송해서 receiver입장에서는 중복
+sender가 packet을 보냈지만 delay가 되고, receiver가 받기전에 sender가 timeout이 되어 retransimission했을 때 receiver는 결국 2번 받음..
+두번 받고 ack을 두번 보내게 된다.
+
+4.
+no. GB cumulative ack의 의미는 그 번호포함 이전의 패킷까지는 받았다이고, SR ack의 의미는 독립적으로 그 번호 ack만 잘 받았다라는 의미를 가지고 있다.
+
+5.
+gbn의 sequence number는 받았던 세그먼트의 넘버..., TCP의 sequence number는 다음 받아야할 byte stream을 mss단위로 쪼개서 받아야할 다음 
+ byte number

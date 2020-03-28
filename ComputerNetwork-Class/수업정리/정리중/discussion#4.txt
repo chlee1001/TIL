@@ -1,0 +1,9 @@
+1. 클라이언트에서 host name을 입력해서 검색하면 Local DNS server에서 Root DNS server가 TLD주소를 local에게 알려줌. Local이 다시 TLD server로가서 authoritative server를 알아온 후 Local이 authoritative server로 가서 ipadress를 알아옴. 그리고 클라이언트한테 알려줌.
+
+2.  rarest first: peer 들에게 chunk를 모아야하는데 여러 chunk들 중에서 어느 chunk를 사용할까 고려할때 ,,,--->> rare한 것은 common하게 바꿔주는 것...
+optimistically unchoke : 새로운 유저가 그 그룹에 들어왔을 때 가진 chunk가 없어서 연결을 못함.. 그걸 막기 위해서 optimistically unchoke를 사용해서 다른 유저가 랜덤하게 chunk를 보내서 그 아무것도 없는 새로운 유저가 chunk를 가질 수 있게해서 그 유저가 다른 유저와 chunk를 주고 받을 수 있게 하는 것..
+
+4. 22bit이므로 223.001.00이 prefix
+2^10 = 2014
+11000000 00000001 000000 /
+11000000 00000001 000000/ 01  같은 서브넷

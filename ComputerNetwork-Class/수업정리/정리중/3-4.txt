@@ -1,0 +1,165 @@
+congestion control
+
+packet arrival rate가 output link capacity보다 클때,
+queueing delay 가변적발생... 버퍼가 꽉차면 loss발생할 수 있다.
+
+나가는 rate... 나가는 쪽의 링크의 bandwidth. --> departure rate
+들어오는 rate --> arrival rate.... 평균적으로 도착하는 초당 몇개의 패킷가 도착하는지.. L 패킷의 길이.
+==> 순간적으로 R보다 La가 순간적으로 커지면 queueing delay 발생한다.
+
+La/R = Traaffic Intensity ..평균값
+평균적으로 arrival rate가 크면 줄이 끝없이 길어짐... 그래서 La/R은 항상 1보다 작거나 같다.
+
+
+p.5의 그림의 x좌표는 traffic intensity.... arrival Rate가 0이면 La/R은 0... 1이되면.. 점점 R에 가까워진다.
+하지만 arrival Rate는 랜덤적이다. --> 이걸 poisson distribution으로 가정했을 때, 평균적인 queueing delay는 (La/R) / (1-La/R)..
+,,,traffic intensity / 1-traffic intensity.. --> 그래서 traffic intensity가 작을 때는 queueing delay가 거의 없거나 작은데,
+1에 가까워지면 (arrival rate가 departure rate에 접근하면) queueing delay는 거의 무한대에 가까워진다. 
+==> 결국 congestion에 따라 queueing delay가 증가
+
+Packet Loss
+queueing delay로 queue가 증가하면 버퍼가 꽉차게 되고... 결국 일부 패킷은 loss가 된다. 이 패킷은 재전송하게 된다.
+
+
+TCP source들이 네트워크가 동작할 수 없을 만큼 패킷을 보내면... 결국 congestion발생..--> 이에 증상은 delay와 loss 
+
+@@@@@@ 그래서 이런 delay와 loss가 발생하지 않도록 congestion control - (네트워크의 상태를 보고 보냄)을 해줘야한다.
+
+예제..
+
+Scen1 p.8
+두개의 sender와 receiver.., 하나의 라우터, buffer의 크기는 무한대, output link capacity는 R..(각 flow는 R/sender = R/2) 가정
+- 버퍼크기가 무한대면 패킷 loss는 없다.
+
+람다 in(보내는 속도), 람다out(받는 속도) --> 보내는 속도 = 받는 속도
+lamda in이 0이면 lamda out도 0... 람다in이 점점 커지면, 람다 out도 점점 커진다.
+하지만 람다in은 계속 증가해도... output link capcacity의 each flow shares가 R/2이므로 lamda out은 최대 R/2를 넘을 수 없게 된다.
+...보내는 사람이 받는 사람에게 R/2에 가까워지게 계소고 보내게 되면(traffic intensity를 높임) congestion증가 --> queueing delay 증가.
+==> 결국 congestion을 증가 시키면 queueing delay가 발생하는 문제발생..
+
+
+
+Scen2 p.9
+하나의 라우터에 유한한 버퍼크기 (packet loss 발생 가능 - retransmission 가능)
+lamddain = lamda out --> aplication layer관점임   --> 5개 5개....각 5Mbps로 같음 5개는 goodput
+
+lamda in'(retransmission이 더해진 rate) 
+--> 예로 만약 1,2,3,4,5 순으로 패킷을 보낼 때 만약 2를전송하면 lamda in은 1 2 2 3 4 5 lamda out 12345로 ...6Mbps / 5Mbps로다르게 된다.
+(transport layer에서 발생하기 때문에 tranport layer 관점) --> 재전송한 6개 throughput
+goodput은 thoughput에 속함... throuput은 goodput에 속하지 않음
+
+lamda in ..goodput이 최대 R/2까지만 증가한다. 넘어가면 loss되니깐 안보내기 때문에
+p.12 congestion이 발생하면 traffic intensity가 증가하고 결국 #loss#가 발생하고 goodput감소 ... lamda out에 비해..
+p.13.. loss가 발생하지않았는데 큰 delay로 인해 재전송이되고, receiver의 duplicates.발생
+congestion이 발생해서 queueing delay갑자기 증가로 #duplicate#발생해서 goodput감소
+
+----라우터 하나라고 가정ㅇ했지만 다음은...여러개 라우터.
+
+Scen3. multi hop으로 가정......여러 hop을 걸치면서 congestion발생 확률 증가...loss나 queueing delay발생 가능성도 증가
+p.15 아래 그림.. 3개의 hop을 지나면서 마지막에 loss 발생하면... 결국 패킷은 receiver에 도착하지 못하고.... 거쳐온 모든 라우터의
+리소스를 낭비..결과적으로 그 라우터들은 아무일도 못한 라우터가 된다..
+--> 멀티홉이 되면 라우터의 리소스는 낭비되고, goodput은 크게 떨어진다.
+
+S-0-0-0-0-0-D
+각 라우터가 리소스 10%씩 사용... 5번째 라우터에서 패킷이 드랍되면 거쳐온 각 라우터(1,2,3,4)의 리소스10%가 낭비되게 된다...
+loss가 발생하면 할 수로고 낭비되는 리소스가 많아진다.... congestion이 발생하면 할 수록 유효한 capacity가 사라진다..-->goodput이 떨어짐
+라우터의 성능을 다 못씀.... sender가 보내는 것에 비해 receiver는 받지를 못하게 된다.
+나중에 인터넷을 못쓰게 된다..
+
+
+--> congestion control해야함...많이 보내서 congestion발생하면 안되고, 적게 보내서 goodput을낮게 하지않게 적절한 양을 찾아서 보내는 것
+
+
+
+TCP congestion control
+End to End congestion control... TCP sender가 ...
+네트워크성능을 확인해서 받을 수 있는 만큼만 보낸다.
+
+Sending rate를 조절
+
+TCP sender는 receiver의 ACK정보를 통해서...파악.. ACK이 안오면 congestion이 발생.. ACK이 잘오면 congestion이 발생 x
+
+
+
+TCP congestion control
+
+p.20
+#1.. How does the sender limit the rate?
+A1... congestion window의 크기를 조절하여 ...
+sender가 마지막으로 보낸 byte... 마지막ACK의 byte의 차이가 윈도우의 크기...==> window크기는 네트워크 상태 고려...
+TCP sending rate: congestion window의 크기 / RTT ==> 결국 TCP sending rate를 조절한다는 것은 window크기를 조절하는 것과 같다.
+하지만 위 식의 RTT는 가변적인 값이기 때문에 대강 TCP sending rate ~= cwnd /rate 인것이다.
+ 
+congestion control - window크기와 flow control - receiver가 받을 수 있는 크기.... 그래서 sending window의 크기는 두 조건을 고려햐여
+작은 것으로 한다.
+
+
+p.23
+How des the sender know there is congestion on path between itself and destinationn?
+loss없이 ACK이 잘 왔으면 congestion이 없다고 생각하게 됨...-> 그러면 sending rate를 너무 작게 했나라고 생각함..
+만약 loss가 발생하면(timeout이나 three duplicate ACK) congestion이 발생하고 있음을 의미...그래서 sending rate를 줄임.
+
+
+
+p.25
+What algorithm should sender use to change send rate as function of congestions? 
+TCP sender에 알고리즘은... 만약 congestion이 없다고 생각되면 sending rate를 높여주고, congestion이 발생해서 goodput이 떨어지면,
+sending rate를 낮춰준다.. 그래서 적절한 값을 찾아줘야한다..  ==> 이를 계속 찾아주는 것을 Bandwidth probing이라고 한다.
+TCP congestion control algorithm-sneding rate가 증가할때는 천천히... congestion이 발생하면 확 줄인다.
+congestion 유무는 loss로만 알 수 있다.
+
+TCP congestion Control: two modes
+==>congestion window
+==> slow-start threshold value.
+
+초기(cwnd<ssthresh이먄) slow start를 한다. 그후 cwnd>= ssthresh되면 CWND를 이용한다.
+
+cwnd는 1MSS로 초기지정
+윈도우 ACK이 올때매다 윈도우크기를 1MSS를 증가한다.
+결국MSS는 2배씩 증가한다.
+slow-start threshold 임계값까지 올려준다.
+이를 하는 이유는 bandwidth proving을 할 때 임계값을 빨리 찾기 위해 2배씩 증가한다.
+
+
+cwnd가 ssthresh라는 임계값을 넘어서면 cwnd = cwnd+ (1MSS)/cwnd
+
+만약 loss발생하면 cwnd를 1mss로 바꾸고.. slow-start threshhold value를 절반으로 바꾼다.
+다시 run
+
+-----sshthresh까지는 빠르게 증가하는데.. 그 이후는 천천히 증가한다.
+
+TCP Reno summary
+
+dupplicate ACK은 timeout에 비해 congestion이 심각하지 않음
+
+three duplicate로 fast retransmit이 일어나면 심각한 congestion이 아니기 때문에 fast recovery를 통해서 ssthresh부터 시작한다.
+
+timeout은 retransmit하는데 slow start부터 한다.
+
+
+
+
+
+증가할 때는 천천히 증가 -additive increase
+감소할때는 절반으로 떨어뜨리거나.. 1로 떨어뜨리거나 -> multiplicative decrease
+==> AIMD
+이 그래프는 톱니모양처럼 생겼다.
+
+
+TCP congestion control...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

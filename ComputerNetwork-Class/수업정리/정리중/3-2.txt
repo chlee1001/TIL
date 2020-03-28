@@ -1,0 +1,133 @@
+
+
+sender: rdt send..--> udt send (이후부터 unreliable channel..)
+
+receiver: 그 데이터가 unreliable channel에서 왔기 때문에 rdt rcv로 호출 그후 deliver data
+
+
+
+
+-------
+unreliable channel error...
+
+bit error
+
+congestion....queueing delay..(router output buffer에서) 발생 할 경우 packet loss
+
+reordering or duplication...순서가 잘못되거나 중복될때..
+
+
+
+
+rdt1.0 
+
+FSM
+sender: 상위layer에서의 call을 기다림, call(rdt send (data))이 오면 packet data를 묶어 udt sender로 보냄
+
+receiver: 하위 layer에서의 call을 기다림..., call(rdt_rcv (packet))r가 오면 packet을 data로 바꿔 deliver_data로 보냄
+
+
+
+rdt2.0 -- bit errors
+error detection 기능 추가 (checksum 필요)
+error checking... error 있으면 NAK, 없으면 ACK
+sender는 ACK NAK을 기다림...
+--->>>> feedback , retransmission
+
+FSM
+sender는 ~~~~~packet에 data와 checksum을 묶어 udt sender후 에러 발생가능성이 있기 때문에 receiver로부터의 ACK 또는 NAK을 기다린다.
+
+receiver 하위 레이어로부터 packet을 받아 checksum을 확인하여 corrupt --> sender로 udt_send(NAK) 전송, 그 받은 패킷은 버림
+/ notcorrupt--> 패킷을 열어 data를 deliver한다 --> ACK 전송,
+// sender가 ACK을 받은 후 부터는 상위 레이어의 콜을 기다린다. // NAK이 오면 retransmission
+
+그래서 rdt 2.0은 stop and wait
+
+
+
+
+
+rdt 3.0 
+
+sender입장에서 정해진 시간동안 packet이 안오면 receiver로부터의 ACK이 loss 됨
+그 시간은 과거의 rtt에 의해 정해진다.
+
+sender: 상위 레이어에서 data오면 checksum을 적고 packet을 보냄 타이머를 설정하여 타이머 시간안에 ack이 안오면 retransmission함
+
+bit error나 loss가 일어나면 receiver는 아무 것도 안하기 때문에 sender에서 timeout이 일어난다.
+
+p.20 
+a) receiver가 data를 받았음에도..ack이 loss되면 sender입장에서 retransmission함.. 그래서 receiver는 data가 duplicate됨..
+그래서 detect duplicate 필요 --> duplication인지 구분하기 위해서는 sender는 data를 보낼 때 sequence number를 넣어서 보낸다.
+(1bit... 01010101.... 0이 오면 다음 패킷은 1이 와야한다.)
+
+b) sender가 보낸 packet이 delay가 발생해서... receiver는 잘 받았지만 timeout이 지나서 이미 sender는 다시 패킷을 보냄.. 
+그리고 sender는 receiver로부터 첫번째 보낸 패킷의 ack을 받아 다음 packet을 보냄... 그리고 다시 두번째 보낸 패킷에 대한 ack을 받음
+하지만 sender는 duplicate ack을 받음.. 그건 버림
+
+--------------여기 까지 stop and wait
+
+p.22 23 이해해보자
+한번에 여러개의 packet을 보내면 utilization이 올라간다.
+
+
+==> pipelined protocols... ==> N=한번 보내는 packet 수, N=1 은 stop and wait, N이 커지면 utilization이 좋아짐.
+하지만 커지면.... congestion발생...
+
+
+
+----------------
+
+Go-Back-N ...N개를 보내보고 N개의 패킷을 받고...--> N이 증가하면 packet이 넘버를 표시하기 위한 1bit가 아닌 k bit가 필요
+
+GBN in action
+N (= window size) sender가 N개만큼 packet을 보내고 답을 기다린다.(wait)
+저 보낸 패킷중 가장 오래된 패킷을 base라고 한다.
+0번 패킷이 receiver에 도착했을 때 ACK0이 온다. --> 0번 패킷은 window에서 빠진다. (window가 N인데 N-1개 됐음으로) 하나도 보낼 수 있다.
+GBN에서 순서대로 오지않은 패킷은 버린다. 대신에  정확한 순서대로 가장 최근에 온 패킷을 보낸다. (ack1이면 1번까지는 순서대로 왔는데 그 이후는 순서가 틀렸다)
+만약 n번째 패킷의 응답이 안오면 timeout으로 n번째 패킷부터 N개를 보내준다.
+nextseqnum:  다음에 보낼수 있는 패킷 ..,,,base가 오면 다음에 보낼 수 있는 패킷이 새로 슬라이드된다.
+
+cumulative ACK...순서가 중요.. ex) 10ack의 의미는 receiver가 10을 포함한 전의 데이터를 다 잘받았다라는 것을 의미하기 때문에
+sender가 8ack을 못받아도 10ack을 받으면 receiver가 전의 데이터를 다 잘 받았다는 의미를 가지고 있다.
+
+
+
+rdt3.0과 다른점이 N개를 보낸다.\
+
+gobackn의 receiver는 순서에 맞게 온것만 취급, 순서에 맞게 오지 않는 것들은 무시..
+expectedseqnum은 10번 ack을 보내면 11번이 된다. 그래서 다음 11번패킷이 오면 11ack을 보내고 12가 된다.
+그래서 gbn receiver는 expectedseqnum만 본다...결국 순서대로 오기 때문에.. 그냥 오는데로 application에 올리면 된다.
+단순.. no receiver buffering.
+
+---------
+selective repeat (SR)
+
+receiver는 individual ack을 보낸다.. 각각의 ack을 보낸다....
+순서에 맞지 않는 경우가 있으므로 바로 application에 올리지 못한다.
+
+만약 3번이 loss되고 45번은 정상적으로 ack이 왔다면 45번은 receiver 버퍼에 저장한다(3번이 다시 올 때까지)
+
+retransmission 측면은 효율적인데...과거의 gbn보다 복잡하다.
+receiver는 받은 패킷넘버과 받지 못한 패킷을 구분해야한다.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

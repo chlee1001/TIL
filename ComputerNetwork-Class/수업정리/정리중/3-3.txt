@@ -1,0 +1,137 @@
+
+TCP
+
+--> TCP/IP는 현대 Internet에서 중요..
+
+TCP는 connection oriented ...연결을 먼저함..
+TCP buffer는 data를 저장하는 공간.. TCP send buffer 보내기 위해 저장하는 공간 TCP receiver buffer 받기 위해 저장하는 공간...
+TCP는 대부분 양방향..full duplex이기 때문에.. send/receive buffer구분할 필요없을 듯..
+
+MSS는 MTU에 의해 결정된다.
+TCP는 순서대로 받는데... byte stream으로 받는다. 각각 segement의 첫번째 byte number가 sequence number가 된다.
+ACK은 다음 받아야할 segment는 넘버...1번째 세그먼트를 받으면 2번째 세그번트이 sequene number인 1000을 보낸다.(1000전까지는 잘 받았다.
+너는 1000부터 보내면 된다.)
+
+만약 receiver가 sender한테 보낼 데이터가 잇으면 데이터에 ack을 실어서 보낸다. piggybacked
+
+Cumulative ACK
+ack이 loss나도 괜찮다...
+
+
+p.13
+
+timeout을 짧게 하면, loss가 없음에도 retransmission이 많아짐...
+timeout이 길어지면,... loss가 한번 발생했을 때 생기는 피해가 크다.
+--> 그래서 적당한 시간이 필요 ==> timeout시간을 RTT를 이용해서 정한다 ....이 RTT값은 매번 바뀜(queueing delay 때문에)
+
+
+데이터를 보내고 SampleRTT를 측정. 여러개의 sampleRTT로 smoother한 estimated RTT를 구한다. 
+--> sampleRTT: 데이터를 보내고 ack을 받은 시간 측정.
+estimated RTT(n) = (1-α) * estimatedRTT(n-1) + α*sampleRTT(n). ...exponential weighted moving average.(최근값을 더 많이 반영한 평균값)
+retransmit일 때는 계산하지 않는다.
+
+p.16
+RTT deviation.
+
+DevRTT: RTT variation
+
+DevRTT = (1-β)*DevRTT+β+|sampleRTT-estimatedRTT|
+
+
+-------
+
+
+TCP reliable data transfer..
+retransmission timer가 하나.... 한개의 가장 오래된 패킷에만(base...첫번째 패킷) 설정.
+GBN과 달리 base packet하나만 재전송.
+
+
+
+p.23 비룍 92 sequence number의 ack이 loss됐지만, 그 뒤에 120의 ack이 정상적으로 왔기 때문에..괜찮다ㅏ.
+
+
+연속적으로 timeout됐을 때
+1. estimatedRTT를 계속 기다린다.
+2. timeout 일어날 때마다 timeoutInterval을 2배씩 키워줌. >> 이걸 사용
+이후 다시 정상적으로 되면, timeout값을 낮춘다.
+
+--------
+delayed ACK -- skip
+
+TCP fast retransmit
+receiver는 in order segment를 받는다.. 만약 B가 A한테 ACK 120을 보냈는데 140이 오면 다시 A한테 ACK120으로 보냄.하지만 A입장에서는
+중복ACK이다. 이 중복 ACK이 3개 오면 == sender 입장에서 NAK이라고 이해한다. 그래서 그 120을 보낸다.
+
+........reordering
+
+p.26 그래서 결국 NAK이 되서 b는 seq=100인 세그먼트를 받고 다음은 180을 요청한다. seq=160,20byte..(179까지 잘 받았기 때문에)
+
+TCP는 comulative는 GBN과 비슷하며, 순서대로 오지않아도 버퍼에 저장하는 것을 보면 SR과 비슷하다.
+N개 전부 retransmit하는데 / 필요한 부분만 retransmit한다. 
+
+==> 두가지 장점을 합쳤다.
+
+
+
+
+----------------------3.5 flow control
+만약 sender가 성능이 좋아서(1Gbps) 한번에 많은 데이터를 보내지만.. receiver는 성능이 안좋아서(10Mbps) .... 어느정도 받다가 드랍됨..
+그래서 sender는 receiver의 버퍼 크기 만큼만 보내야한다.. (receiver가 sender에게 버퍼크기를 알려줌.: receive window)
+flow control: sender가 receiver의 버퍼크기에 맞춰서 보내는 것.
+
+
+
+------connection Management
+
+TCP 3-way handshake
+
+서버입장에서 client가 서버의 메시지를 받았는지 확인하기 위해.. 총 3번의 과정을 한다.
+
+클라이언트가 서버한테 TCP SYN msg를 보냄(연결 요청..헤더에 flag.s...SYNbit=1, seq=x)
+서버는 TCY SYN msg에 대한 응답으로 TCP SYNACK을 보낸다(SYNbit=1, seq=y / ACKnum=x+1 ) 이때 서버는 TCP buffer를 할당한다.
+클라이언트는 다시 서버에게 SYNACK에 대한 ACK을 보낸다 (SYNbit=1, ACKnum=y+1) << 이건 ACK만 보낼 수도 있고, data를 보내면서 ack을 담아 보낼 수 있다.
+이때 client도 TCP buffer를 할당한다.  -->서버는 ACK(y)를 받고 client가 살아있음을 안다. loss되면 connection을 다시 해야한다.
+
+
+
+
+
+
+
+--SYN flood attack..
+DoS attack.
+많은 이용자가 SYN packet만 보내도... connection을 받고 버퍼공간을 잡기 때문에.....(sender가 응답을 안하면timeout이 일어나서 해제해주지만)
+계속 계속 보내면 메모리 공간이 다 차게 되서...서비스가 중지됨...--> SYN을 받자마자 공간을 받기 때문에...
+--> 그래서 SYNACK의 ACK이 와야 공간을 잡아줌... 하지만 ACK공격하면 또 문제됨..
+
+제대로된 SYN, SYNACK, ACK을 하게 하면 괜찮아짐... 확인하면 됨.. SYNACK의 seq와 ACK의 seq+1 이 sequence num을 잘 확인하면 된다.
+
+내가 누구한테 보내고, 누구한테 ACK이 왔는지 확인해하는데... 이에 overhead가 발생한다.
+그래서 SYN cookie를 이용.. client가 data나 ACK을 보낼 때 source IPaddress와 dest IP address를 적어서 보낸다. 그래서 SYN과 ACK의
+주소가 같은지 확인... --> SYN packet을 받고 그 패킷의 source ip와 dest ip와 서버의 비밀번호를 더해 hash한 값을 seq로 한다.
+그럼 정상적인 client면 그 seq+1을 보낼텐데 그러면 서버가 그 seq+1에 -1을 하고 그 값과, client가 보낸 ACK의 주소와 비밀번호를 더한값의
+hash한 값이랑 같은지 비교..
+
+
+이 hash의 결과가 같을 수도 있지만... 상관없다. client의 요청이 정상적인지를 확인하기 위함..
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

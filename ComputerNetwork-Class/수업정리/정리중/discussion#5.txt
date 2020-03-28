@@ -1,0 +1,14 @@
+1. 192.9.88.46 / public/  --->192.168.....10으로 시작하면 private... 그외는 public
+client discover DHCP서버 찾기
+offer client 찾기...
+client가 request IP address달라고 요청
+ACK 보냄 ...yiar를 보고 client가 설정.
+
+
+2. NAT은 internal address를 external address로 변환해준다.
+NAT table에는 공용아이피와 internal ip가 매칭된 정보와 포트번호는 다른 호스트와 겹치기 때문에 구분할 수 있도록 변환된 포트번호와 원래 포트번호 정보
+.
+4. both...  ipv4로 보내야되기때문에 ....encapsul해서 보내야한다. 그러기 때문에 ipv4도 이해해야한다.
+
+5. subnet에 있는 여러 주소를 forwading table에 넣어서 관리하면 entry가 많아지기 때문에 multiple subnets를 single prefix으로 aggregation하여 forwarding table에 적어준다...--> entry가 줄어듬..
+만약 subnet이 다른 ISP로 이동하면 prefix matching이 여러번 일어날 수 있으므로 longest pefixmatching을 이용하여 자세히 확인해준다.
