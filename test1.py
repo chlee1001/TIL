@@ -1,51 +1,41 @@
 import numpy as np
 import pandas as pd
 
-# # Load data with using columns
-# data = pd.read_csv("match_winner_data_version1.csv",
-#                    usecols=['win', 'firstBlood', 'firstTower', 'firstInhibitor', 'towerKills', 'inhibitorKills',
-#                             'baronKills', 'dragonKills', 'riftHeraldKills', 'gameId'])
-# print(data.head())
-#
-# # Categorical Feature: win, firstBlood, firstTower, firstInhibitor
-# # Numerical Feature: towerKills, inhibitorKills, baronKills, dragonKills, riftHeraldKills, gameId
-#
-# # Missing Data detection
-# # Find columns with missing value
-# columnMD = data.columns[data.isnull().any()]
-# print(columnMD)
-#
-# # Find rows with missing value
-# rowMD = data[data.isnull().any(axis=1)]
-# print(len(rowMD))
-#
-# # Among the missing values, numerical data: towerKills, inhibitorKills, baronKills, dragonKills
-# # Fill with mean (Rounds mean to nearest integer)
-# data['towerKills'].fillna((data['towerKills'].mean().round(0)), inplace=True)
-# data['inhibitorKills'].fillna((data['inhibitorKills'].mean().round(0)), inplace=True)
-# data['baronKills'].fillna((data['baronKills'].mean().round(0)), inplace=True)
-# data['dragonKills'].fillna((data['dragonKills'].mean().round(0)), inplace=True)
-#
-# # Finding the wrong game that is not divided by win or lose and any others (Check using toowerkills)
-# for i in range(len(data)):
-#     if data['towerKills'][i] < 5.0:
-#         data.drop(i, inplace=True)
-#
-# # data.to_csv("new.csv", mode='w')
+# Load data with using columns
+data = pd.read_csv("match_winner_data_version1.csv",
+                   usecols=['win', 'firstBlood', 'firstTower', 'firstInhibitor', 'towerKills', 'inhibitorKills',
+                            'baronKills', 'dragonKills', 'riftHeraldKills', 'gameId'])
+print(data.head())
 
-# -----------------------------------------------
+# Categorical Feature: win, firstBlood, firstTower, firstInhibitor
+# Numerical Feature: towerKills, inhibitorKills, baronKills, dragonKills, riftHeraldKills, gameId
+
+# Missing Data detection
+# Find columns with missing value
+columnMD = data.columns[data.isnull().any()]
+# print(columnMD)
+
+
+# Among the missing values, numerical data: towerKills, inhibitorKills, baronKills, dragonKills
+# Fill with mean (Rounds mean to nearest integer)
+data['towerKills'].fillna((data['towerKills'].mean().round(0)), inplace=True)
+data['inhibitorKills'].fillna((data['inhibitorKills'].mean().round(0)), inplace=True)
+data['baronKills'].fillna((data['baronKills'].mean().round(0)), inplace=True)
+data['dragonKills'].fillna((data['dragonKills'].mean().round(0)), inplace=True)
+
+# Finding the wrong game that is not divided by win or lose and any others (Check using toowerkills)
+for i in range(len(data)):
+    if data['towerKills'][i] < 5.0:
+        data.drop(i, inplace=True)
+
+data.to_csv("new.csv", mode='w') # 1차...
+
+
 data = pd.read_csv("new.csv")
 # print(data.head())
 
 # Find rows with missing value
 rowMD = data[data.isnull().any(axis=1)]
-print(data)
-# print(data.loc[21])
-
-
-#
-# print(rowMD.loc[[21], :])
-# print(rowMD['index'][21])
 
 
 def findCategoricalMD(fIndex, fgameId):
@@ -84,15 +74,20 @@ def findCategoricalMD(fIndex, fgameId):
                 data['firstInhibitor'] = data['firstInhibitor'].replace(np.nan, firstInhibitor)
 
 
-
-
-count = 0
 for i in range(len(data)):
     try:
         if rowMD['index'][i]:
-            # print(rowMD['gameId'][i])
             findCategoricalMD(i, rowMD['gameId'][i])
     except KeyError:
-        count += 1
+        continue
 
-data.to_csv("new1.csv", mode='w')
+data.to_csv("new1.csv", mode='w') # 2차....
+
+# ---------------Complete Preprocessing--------------------
+# ---------------------------------------------------------
+
+data = pd.read_csv("new1.csv",
+                   usecols=['win', 'firstBlood', 'firstTower', 'firstInhibitor', 'towerKills', 'inhibitorKills',
+                            'baronKills', 'dragonKills', 'riftHeraldKills', 'gameId'])
+print(data.head())
+
