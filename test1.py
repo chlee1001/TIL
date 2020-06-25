@@ -1,93 +1,115 @@
-import numpy as np
 import pandas as pd
+from sklearn import preprocessing
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
 
 # Load data with using columns
-data = pd.read_csv("match_winner_data_version1.csv",
+data = pd.read_csv("Final_data.csv",
                    usecols=['win', 'firstBlood', 'firstTower', 'firstInhibitor', 'towerKills', 'inhibitorKills',
-                            'baronKills', 'dragonKills', 'riftHeraldKills', 'gameId'])
+                            'baronKills', 'dragonKills', 'riftHeraldKills'])
 print(data.head())
 
-# Categorical Feature: win, firstBlood, firstTower, firstInhibitor
-# Numerical Feature: towerKills, inhibitorKills, baronKills, dragonKills, riftHeraldKills, gameId
+# Scaling
+# Make DF...with Height, Weight
 
-# Missing Data detection
-# Find columns with missing value
-columnMD = data.columns[data.isnull().any()]
-# print(columnMD)
+df = pd.DataFrame(columns=['win', 'firstBlood', 'firstTower', 'firstInhibitor', 'towerKills',
+                           'inhibitorKills',
+                           'baronKills', 'dragonKills', 'riftHeraldKills'])
 
+df['win'] = data['win']
+df['firstBlood'] = data['firstBlood']
+df['firstTower'] = data['firstTower']
+df['firstInhibitor'] = data['firstInhibitor']
+df['towerKills'] = data['towerKills']
+df['inhibitorKills'] = data['inhibitorKills']
+df['baronKills'] = data['baronKills']
+df['dragonKills'] = data['dragonKills']
+df['riftHeraldKills'] = data['riftHeraldKills']
 
-# Among the missing values, numerical data: towerKills, inhibitorKills, baronKills, dragonKills
-# Fill with mean (Rounds mean to nearest integer)
-data['towerKills'].fillna((data['towerKills'].mean().round(0)), inplace=True)
-data['inhibitorKills'].fillna((data['inhibitorKills'].mean().round(0)), inplace=True)
-data['baronKills'].fillna((data['baronKills'].mean().round(0)), inplace=True)
-data['dragonKills'].fillna((data['dragonKills'].mean().round(0)), inplace=True)
+# StandardScaler
+scaler = preprocessing.StandardScaler()
+scaled_df = scaler.fit_transform(df)
+scaled_df = pd.DataFrame(scaled_df,
+                         columns=['win', 'firstBlood', 'firstTower', 'firstInhibitor', 'towerKills', 'inhibitorKills',
+                                  'baronKills', 'dragonKills', 'riftHeraldKills'])
 
-# Finding the wrong game that is not divided by win or lose and any others (Check using toowerkills)
-for i in range(len(data)):
-    if data['towerKills'][i] < 5.0:
-        data.drop(i, inplace=True)
+fig, (ax1, ax2) = plt.subplots(ncols=2)
+ax1.set_title('Before StandardScaling')
+ax1.grid(True)
+sns.kdeplot(df['win'], ax=ax1)
+sns.kdeplot(df['firstBlood'], ax=ax1)
+sns.kdeplot(df['firstTower'], ax=ax1)
+sns.kdeplot(df['firstInhibitor'], ax=ax1)
+sns.kdeplot(df['towerKills'], ax=ax1)
+sns.kdeplot(df['inhibitorKills'], ax=ax1)
+sns.kdeplot(df['baronKills'], ax=ax1)
+sns.kdeplot(df['dragonKills'], ax=ax1)
+sns.kdeplot(df['riftHeraldKills'], ax=ax1)
 
-data.to_csv("new.csv", mode='w') # 1차...
-
-
-data = pd.read_csv("new.csv")
-# print(data.head())
-
-# Find rows with missing value
-rowMD = data[data.isnull().any(axis=1)]
-
-
-def findCategoricalMD(fIndex, fgameId):
-    tempData = pd.read_csv("match_loser_data_version1.csv",
-                           usecols=['firstBlood', 'firstTower', 'firstInhibitor', 'gameId'
-                                    ])
-
-    for i in range(len(tempData)):
-        if tempData['gameId'][i] == fgameId:
-            print(tempData.loc[[i], :])
-            firstBlood = tempData['firstBlood'][i]
-            firstTower = tempData['firstTower'][i]
-            firstInhibitor = tempData['firstInhibitor'][i]
-
-            # nan일 경우 값 변경
-            # loser data T --> F // F --> T
-            if data.loc[fIndex, 'firstBlood']:
-                if firstBlood:
-                    firstBlood = False
-                elif not firstBlood:
-                    firstBlood = True
-                data['firstBlood'] = data['firstBlood'].replace(np.nan, firstBlood)
-
-            if data.loc[fIndex, 'firstTower']:
-                if firstTower:
-                    firstTower = False
-                elif not firstTower:
-                    firstTower = True
-                data['firstTower'] = data['firstTower'].replace(np.nan, firstTower)
-
-            if data.loc[fIndex, 'firstInhibitor']:
-                if firstInhibitor:
-                    firstInhibitor = False
-                elif not firstInhibitor:
-                    firstInhibitor = True
-                data['firstInhibitor'] = data['firstInhibitor'].replace(np.nan, firstInhibitor)
+ax2.set_title('After StandardScaling')
+ax2.grid(True)
+sns.kdeplot(scaled_df['win'], ax=ax2)
+sns.kdeplot(scaled_df['firstBlood'], ax=ax2)
+sns.kdeplot(scaled_df['firstTower'], ax=ax2)
+sns.kdeplot(scaled_df['firstInhibitor'], ax=ax2)
+sns.kdeplot(scaled_df['towerKills'], ax=ax2)
+sns.kdeplot(scaled_df['inhibitorKills'], ax=ax2)
+sns.kdeplot(scaled_df['baronKills'], ax=ax2)
+sns.kdeplot(scaled_df['dragonKills'], ax=ax2)
+sns.kdeplot(scaled_df['riftHeraldKills'], ax=ax2)
+plt.show()
+# print(df)
+# print(scaled_df)
 
 
-for i in range(len(data)):
-    try:
-        if rowMD['index'][i]:
-            findCategoricalMD(i, rowMD['gameId'][i])
-    except KeyError:
-        continue
+# Split train data set and test data set
+X = scaled_df[['firstBlood', 'firstTower', 'firstInhibitor', 'towerKills', 'inhibitorKills',
+               'baronKills', 'dragonKills', 'riftHeraldKills']]
+y = scaled_df[['win']]
+# print(X)
+# print(y)
 
-data.to_csv("new1.csv", mode='w') # 2차....
+x_train, x_test, y_train, y_test = train_test_split(X, y, train_size=0.8, test_size=0.2, random_state=1)
 
-# ---------------Complete Preprocessing--------------------
-# ---------------------------------------------------------
+model_LR = LinearRegression()
+model_LR.fit(x_train, y_train)
+y_predicted = model_LR.predict(x_test)
 
-data = pd.read_csv("new1.csv",
-                   usecols=['win', 'firstBlood', 'firstTower', 'firstInhibitor', 'towerKills', 'inhibitorKills',
-                            'baronKills', 'dragonKills', 'riftHeraldKills', 'gameId'])
-print(data.head())
+# my_data1 = [[False, True, True, 9, 1, 0, 3, 2]]
+# my_predict1 = model_LR.predict(my_data1)
+# print(my_predict1)
+# my_data1 = [[False, False, False, 1, 0, 0, 1, 0]]
+# my_predict1 = model_LR.predict(my_data1)
+# print(my_predict1)
 
+plt.scatter(y_test, y_predicted, alpha=0.4)
+plt.xlabel("game Data")
+plt.ylabel("Win or Lose")
+plt.title("MULTIPLE LINEAR REGRESSION")
+plt.show()
+
+print(model_LR.score(x_train, y_train))
+
+
+#
+# modelKM = KMeans(n_clusters=3, algorithm='auto')
+# modelKM.fit(X)
+# predict = pd.DataFrame(modelKM.predict(x_test))
+# predict.columns = ['predict']
+#
+# r = pd.concat([X, predict], axis=1)
+#
+# plt.scatter(r['firstBlood'], r['firstTower'], r['firstInhibitor'], r['towerKills'], r['inhibitorKills'],
+#             r['baronKills'], r['dragonKills'], r['riftHeraldKills'], rc=r['predict'], alpha=0.5)
+#
+# # centers = pd.DataFrame(modelKM.cluster_centers_,
+# #                        columns=['firstBlood', 'firstTower', 'firstInhibitor', 'towerKills', 'inhibitorKills',
+# #                                 'baronKills', 'dragonKills', 'riftHeraldKills'])
+# # center_x = centers['Sepal length']
+# # center_y = centers['Sepal width']
+# # plt.scatter(center_x, center_y, s=50, marker='D', c='r')
+#
+# plt.show()
