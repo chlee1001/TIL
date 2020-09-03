@@ -5,3 +5,5 @@
 
 [SweetNap (20.09.01)](https://github.com/chlee1001/TIL/tree/master/Algorithm-Class/20.09.01_algo_SweetNap)
 
+[Pancakes (20.09.03)](https://github.com/chlee1001/TIL/tree/master/Algorithm-Class/20.09.03_algo_pancakes)
+
