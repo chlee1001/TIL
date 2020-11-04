@@ -1,8 +1,0 @@
-﻿  소스.cpp
-c:\users\chlee\documents\visual studio 2017\projects\17.11.21_algo_a marketing strategy\17.11.21_algo_a marketing strategy\소스.cpp(24): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  c:\program files (x86)\windows kits\10\include\10.0.16299.0\ucrt\stdio.h(207): note: 'fopen' 선언을 참조하십시오.
-c:\users\chlee\documents\visual studio 2017\projects\17.11.21_algo_a marketing strategy\17.11.21_algo_a marketing strategy\소스.cpp(31): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  c:\program files (x86)\windows kits\10\include\10.0.16299.0\ucrt\stdio.h(1195): note: 'fscanf' 선언을 참조하십시오.
-c:\users\chlee\documents\visual studio 2017\projects\17.11.21_algo_a marketing strategy\17.11.21_algo_a marketing strategy\소스.cpp(36): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  c:\program files (x86)\windows kits\10\include\10.0.16299.0\ucrt\stdio.h(1195): note: 'fscanf' 선언을 참조하십시오.
-  17.11.21_algo_A Marketing Strategy.vcxproj -> C:\Users\chlee\Documents\Visual Studio 2017\Projects\17.11.21_algo_A Marketing Strategy\Debug\17.11.21_algo_A Marketing Strategy.exe
