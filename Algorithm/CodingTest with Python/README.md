@@ -1,3 +1,0 @@
-# Coding Test with Python
-
-> 
