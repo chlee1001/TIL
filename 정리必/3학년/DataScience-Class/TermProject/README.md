@@ -2,5 +2,25 @@
 
 ### League of Legends win/loss prediction
 
-Read more [here](https://github.com/chlee1001/DataScience_TermProject/raw/master/7%EC%A1%B0.docx)
-
+![DS_Termproject_Final_3](https://user-images.githubusercontent.com/2025813/115812670-b230f000-a42c-11eb-8873-25b7e32227d9.png)
+![DS_Termproject_Final_4](https://user-images.githubusercontent.com/2025813/115812680-b8bf6780-a42c-11eb-8f4e-6ca31f54f2e9.png)
+![DS_Termproject_Final_5](https://user-images.githubusercontent.com/2025813/115812688-bbba5800-a42c-11eb-945c-ba281570bab7.png)
+![DS_Termproject_Final_6](https://user-images.githubusercontent.com/2025813/115812694-bceb8500-a42c-11eb-9fc1-bb2743243341.png)
+![DS_Termproject_Final_7](https://user-images.githubusercontent.com/2025813/115812697-be1cb200-a42c-11eb-9749-e4257a92f8af.png)
+![DS_Termproject_Final_8](https://user-images.githubusercontent.com/2025813/115812699-beb54880-a42c-11eb-928d-3e0fac6e4279.png)
+![DS_Termproject_Final_9](https://user-images.githubusercontent.com/2025813/115812700-bfe67580-a42c-11eb-88f7-eaeb046b9b12.png)
+![DS_Termproject_Final_10](https://user-images.githubusercontent.com/2025813/115812702-c07f0c00-a42c-11eb-936f-ac19a5523ce7.png)
+![DS_Termproject_Final_11](https://user-images.githubusercontent.com/2025813/115812705-c248cf80-a42c-11eb-8837-88c049dddf1f.png)
+![DS_Termproject_Final_12](https://user-images.githubusercontent.com/2025813/115812708-c4ab2980-a42c-11eb-9c8c-44f754f07423.png)
+![DS_Termproject_Final_13](https://user-images.githubusercontent.com/2025813/115812710-c543c000-a42c-11eb-8c59-24b4b476c84b.png)
+![DS_Termproject_Final_14](https://user-images.githubusercontent.com/2025813/115812712-c674ed00-a42c-11eb-973c-95d7f068f4f3.png)
+![DS_Termproject_Final_15](https://user-images.githubusercontent.com/2025813/115812714-c70d8380-a42c-11eb-875f-2f3cd123496f.png)
+![DS_Termproject_Final_16](https://user-images.githubusercontent.com/2025813/115812715-c83eb080-a42c-11eb-96ae-c59ab6bc2a2b.png)
+![DS_Termproject_Final_17](https://user-images.githubusercontent.com/2025813/115812717-c96fdd80-a42c-11eb-8a2e-cddc92c54639.png)
+![DS_Termproject_Final_18](https://user-images.githubusercontent.com/2025813/115812719-caa10a80-a42c-11eb-9363-0dc88dc19871.png)
+![DS_Termproject_Final_19](https://user-images.githubusercontent.com/2025813/115812721-cd036480-a42c-11eb-825b-b1897d458892.png)
+![DS_Termproject_Final_20](https://user-images.githubusercontent.com/2025813/115812723-cd9bfb00-a42c-11eb-8604-0919848ec8f9.png)
+![DS_Termproject_Final_21](https://user-images.githubusercontent.com/2025813/115812724-cecd2800-a42c-11eb-9293-527016e617fc.png)
+![DS_Termproject_Final_22](https://user-images.githubusercontent.com/2025813/115812728-cf65be80-a42c-11eb-8ae6-dcdb3d0464ca.png)
+![DS_Termproject_Final_23](https://user-images.githubusercontent.com/2025813/115812730-cffe5500-a42c-11eb-8beb-a2a7e4c93d60.png)
+![DS_Termproject_Final_24](https://user-images.githubusercontent.com/2025813/115812735-d12f8200-a42c-11eb-944e-24a641d5adc1.png)
